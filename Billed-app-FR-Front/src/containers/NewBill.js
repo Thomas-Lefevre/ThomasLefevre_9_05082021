@@ -21,29 +21,29 @@ export default class NewBill {
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length - 1]
     const fileExtension = fileName.split(".").pop().toLowerCase();
-    // console.log(fileExtension);
-    const validExtensions = ["jpg", "jpeg", "png"]
-    // console.log(validExtensions);
-    if (validExtensions.includes(fileExtension)) {
-      const formData = new FormData()
-      const email = JSON.parse(localStorage.getItem("user")).email
-      formData.append('file', file)
-      formData.append('email', email)
+    const formData = new FormData()
+    const email = JSON.parse(localStorage.getItem("user")).email
+    formData.append('file', file)
+    formData.append('email', email)
 
-      this.store
-        .bills()
-        .create({
-          data: formData,
-          headers: {
-            noContentType: true
-          }
-        })
+    if (fileExtension.match(/^(jpeg|jpg|png)$/)) {
+      this.store.bills().create({
+        data: formData,
+        headers: {
+          noContentType: true
+        }
+      })
         .then(({ fileUrl, key }) => {
           console.log(fileUrl)
           this.billId = key
           this.fileUrl = fileUrl
           this.fileName = fileName
-        }).catch(error => console.error(error))
+        })
+    } else {
+      alert(
+        "Merci d'envoyer uniquement des fichiers au format jpg, jpeg ou png."
+      )
+      document.querySelector(`input[data-testid="file"]`).value = ''
     }
   }
   handleSubmit = e => {
@@ -76,7 +76,6 @@ export default class NewBill {
         .then(() => {
           this.onNavigate(ROUTES_PATH['Bills'])
         })
-        .catch(error => console.error(error))
     }
   }
 }
